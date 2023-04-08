@@ -88,7 +88,14 @@ function BrandPageEdit() {
               </Button>
             </Grid>
             <Grid item xs={3}>
-              <Button variant="contained" color="error" onClick={() => navigate("/brand")}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  dispatch(actions.setReload(new Date() * 1));
+                  navigate("/brand");
+                }}
+              >
                 Hủy bỏ
               </Button>
             </Grid>

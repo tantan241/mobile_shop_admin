@@ -35,11 +35,17 @@ function MainLayout() {
   const handleClick = (id) => {
     id === open.id ? setOpen({}) : setOpen({ id });
   };
-  const pathNameSplit = window.location.pathname ? window.location.pathname.split("/") : ["", "", ""];
-  const pathName = pathNameSplit[2];
+
   useEffect(() => {
+    const pathNameSplit = window.location.pathname ? window.location.pathname.split("/") : ["", "", ""];
+    const pathName = pathNameSplit[2];
     pathName && pathName === "add"
-      ? setTitleAppBar((prev) => `THÊM MỚI ${prev}`)
+      ? setTitleAppBar((prev) => {
+          if (prev && !prev.includes("THÊM MỚI")) {
+            return `THÊM MỚI ${prev}`;
+          }
+          return prev;
+        })
       : pathName
       ? setTitleAppBar((prev) => {
           if (prev && !prev.includes("CẬP NHẬP")) {
@@ -47,7 +53,7 @@ function MainLayout() {
           }
           return prev;
         })
-      : setTitleAppBar((prev) => prev);
+      : setTitleAppBar((prev) => prev.replace("THÊM MỚI", "").replace("CẬP NHẬP", ""));
   }, [store.reload]);
 
   const routers = [

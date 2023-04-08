@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
   Fab,
+  Grid,
   IconButton,
   MenuItem,
   Pagination,
@@ -20,6 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchData } from "~/common";
+import CloseIcon from "@mui/icons-material/Close";
 function CustomFooter(props) {
   const { count, page, handleChangePage, rowsPerPage, handleChangeRowsPerPage, rowsPerPageOptions } = props;
   return (
@@ -48,12 +50,27 @@ function List(props) {
   const [fieldSearch, setFieldSearch] = useState("default");
   const [valueSearch, setValueSearch] = useState("default");
   const [dataSearch, setDataSearch] = useState([]);
+  const [dataFilter, setDataFilter] = useState([]);
   const [reload, setReload] = useState(0);
-  const [sortModel, setSortModel] = useState([]);
-  const [openDialgDelete, setOpenDialogDelete] = useState(false);
+  // const [sortModel, setSortModel] = useState([]);
+  const [openDialogDelete, setOpenDialogDelete] = useState(false);
   const [oneRowDelete, setOneRowDelete] = useState("");
   const [clickDeleteMultiple, setClickDeleteMultiple] = useState(false);
   const navigate = useNavigate();
+  const [openDialogSearch, setOpenDialogSearch] = useState(false);
+  const [openDialogFilter, setOpenDialogFilter] = useState(false);
+  const [filter, setFilter] = useState({
+    field: "",
+    sort: "asc",
+  });
+  const [dataPrev, setDataPrev] = useState({
+    fieldSearch: "default",
+    valueSearch: "default",
+    filter: {
+      field: "",
+      sort: "asc",
+    },
+  });
   const fakeData = [
     {
       name: "--- Chọn giá trị ---",
@@ -125,22 +142,40 @@ function List(props) {
     },
     [dataSearch]
   );
+  const handleFieldFilterChange = useCallback(
+    (name, value) => {
+      setFilter((prev) => ({ ...prev, [name]: value }));
+    },
 
+    []
+  );
   const handleSearch = useCallback(() => {
     setReload(new Date() * 1);
     setPage(0);
+    handleCloseDialogSearch();
   }, [valueSearch, fieldSearch]);
+  const handleFilter = useCallback(() => {
+    setPage(0);
+    setReload(new Date() * 1);
+    handleCloseDialogFilter();
+  }, []);
   useEffect(() => {
     const body = {
       limit: rowsPerPage,
       page: page,
       search: { field: fieldSearch, value: valueSearch, type: typeInputSearch.type },
-      sort: sortModel[0],
+      sort: filter,
     };
+    setDataPrev({
+      fieldSearch,
+      valueSearch,
+      filter,
+    });
     fetchData(`${url}/list-${model}`, body, "POST", true).then((res) => {
       if (res.status === 200) {
         setPageInfo(res.pageInfo);
         setDataSearch(res.dataSearch);
+        setDataFilter(res.dataFilter);
         res.columns.push({
           field: "action",
           headerName: "Hành  động",
@@ -177,7 +212,7 @@ function List(props) {
         setRows(rowsList);
       }
     });
-  }, [url, rowsPerPage, page, mapFunction, model, reload, sortModel]);
+  }, [url, rowsPerPage, page, mapFunction, model, reload]);
   const handleSelectionModelChange = useCallback(
     (newSelectionModel) => {
       const selectedRows = rows.filter((row) => newSelectionModel.includes(row.id));
@@ -187,6 +222,18 @@ function List(props) {
     [rows]
   );
 
+  const handleCloseDialogSearch = useCallback(() => {
+    // setValueSearch("default");
+    // setFieldSearch("default");
+    setOpenDialogSearch(false);
+  }, []);
+  const handleCloseDialogFilter = useCallback(() => {
+    // setFilter({
+    //   field: "name",
+    //   sort: "asc",
+    // });
+    setOpenDialogFilter(false);
+  }, []);
   return (
     <div style={{ height: height, padding: "10px", width: "100%" }}>
       <div
@@ -206,51 +253,43 @@ function List(props) {
         >
           {dataSearch.length > 0 && (
             <>
-              <TextField
-                size="small"
-                select
-                label="Trường tìm kiếm"
-                value={fieldSearch}
-                onChange={(e) => handleFieldSearchChange(e.target.value)}
-              >
-                {dataSearch.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-              {typeInputSearch.type === "select" ? (
-                <TextField
+              <Button color="primary" variant="contained" size="small" onClick={() => setOpenDialogSearch(true)}>
+                Tìm kiếm sản phẩm
+              </Button>
+              <div style={{ margin: "0 5px" }}></div>
+              <Button color="primary" variant="contained" size="small" onClick={() => setOpenDialogFilter(true)}>
+                Lọc sản phẩm
+              </Button>
+              {dataPrev.fieldSearch !== "default" && valueSearch !== "default" && (
+                <Button
                   size="small"
-                  select
-                  label="Giá trị tìm kiếm"
-                  value={valueSearch}
-                  style={{ margin: "0 10px" }}
-                  onChange={(e) => {
-                    setValueSearch(e.target.value);
+                  onClick={() => {
+                    setFieldSearch("default");
+                    setValueSearch("default");
+                    setPage(0);
+                    setReload(new Date() * 1);
                   }}
                 >
-                  {typeInputSearch.value.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              ) : (
-                <TextField
-                  label="Giá trị tìm kiếm"
-                  variant="outlined"
-                  size="small"
-                  style={{ margin: "0 10px" }}
-                  onChange={(e) => {
-                    setValueSearch(e.target.value);
-                  }}
-                />
+                  <CloseIcon></CloseIcon>
+                  Xóa tìm kiếm
+                </Button>
               )}
-
-              <Button color="primary" variant="contained" size="small" onClick={handleSearch}>
-                Tìm kiếm
-              </Button>
+              {dataPrev.filter.field !== "" && (
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setFilter({
+                      field: "",
+                      sort: "asc",
+                    });
+                    setPage(0);
+                    setReload(new Date() * 1);
+                  }}
+                >
+                  <CloseIcon></CloseIcon>
+                  Xóa lọc
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -289,11 +328,11 @@ function List(props) {
         checkboxSelection
         onRowSelectionModelChange={handleSelectionModelChange}
         hideFooterPagination
-        sortModel={sortModel}
-        onSortModelChange={(model) => {
-          console.log(model);
-          setSortModel(model);
-        }}
+        // sortModel={sortModel}
+        // onSortModelChange={(model) => {
+        //   console.log(model);
+        //   setSortModel(model);
+        // }}
         components={{
           Footer: () => (
             <CustomFooter
@@ -311,7 +350,7 @@ function List(props) {
         }}
       />
 
-      <Dialog open={openDialgDelete} onClose={handleCloseDialogDelete}>
+      <Dialog open={openDialogDelete} onClose={handleCloseDialogDelete}>
         <DialogTitle>Bạn có chắc chắn muốn xóa?</DialogTitle>
         <DialogContent></DialogContent>
         <DialogActions>
@@ -331,6 +370,169 @@ function List(props) {
           <Button variant="outlined" autoFocus onClick={handleCloseDialogDelete}>
             Quay lại
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDialogSearch}
+        onClose={() => {
+          handleCloseDialogSearch();
+          setValueSearch(dataPrev.valueSearch);
+          setFieldSearch(dataPrev.fieldSearch);
+        }}
+      >
+        <DialogTitle>Tìm kiếm</DialogTitle>
+
+        <DialogActions style={{ width: "500px", margin: "30px" }}>
+          {dataSearch.length > 0 && (
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  select
+                  label="Trường tìm kiếm"
+                  value={fieldSearch}
+                  onChange={(e) => handleFieldSearchChange(e.target.value)}
+                >
+                  {dataSearch.map((option, index) => (
+                    <MenuItem key={index} value={option.value}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={6}>
+                {typeInputSearch.type === "select" ? (
+                  <TextField
+                    size="small"
+                    fullWidth
+                    select
+                    label="Giá trị tìm kiếm"
+                    value={valueSearch}
+                    // style={{ margin: "0 10px" }}
+                    onChange={(e) => {
+                      setValueSearch(e.target.value);
+                    }}
+                  >
+                    {typeInputSearch.value.map((option, index) => (
+                      <MenuItem key={index} value={option.value}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                ) : (
+                  <TextField
+                    fullWidth
+                    label="Giá trị tìm kiếm"
+                    variant="outlined"
+                    size="small"
+                    // style={{ margin: "0 10px" }}
+                    onChange={(e) => {
+                      setValueSearch(e.target.value);
+                    }}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <div style={{ textAlign: "center" }}>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="small"
+                    onClick={handleSearch}
+                    style={{ marginRight: "5px" }}
+                  >
+                    Tìm kiếm
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    autoFocus
+                    onClick={() => {
+                      handleCloseDialogSearch();
+                      setValueSearch(dataPrev.valueSearch);
+                      setFieldSearch(dataPrev.fieldSearch);
+                    }}
+                    style={{ marginLeft: "5px" }}
+                  >
+                    Quay lại
+                  </Button>
+                </div>
+              </Grid>
+            </Grid>
+          )}
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDialogFilter}
+        onClose={() => {
+          handleCloseDialogSearch();
+          setFilter(dataPrev.filter);
+        }}
+      >
+        <DialogTitle>Lọc sản phẩm</DialogTitle>
+
+        <DialogActions style={{ width: "500px", margin: "30px" }}>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                size="small"
+                select
+                label="Trường lọc"
+                value={filter.field}
+                onChange={(e) => handleFieldFilterChange("field", e.target.value)}
+              >
+                {dataFilter.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                size="small"
+                fullWidth
+                select
+                label="Lọc theo"
+                value={filter.sort}
+                onChange={(e) => {
+                  handleFieldFilterChange("sort", e.target.value);
+                }}
+              >
+                <MenuItem value={"desc"}>Giảm dần</MenuItem>
+                <MenuItem value={"asc"}>Tăng dần</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <div style={{ textAlign: "center" }}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  size="small"
+                  onClick={handleFilter}
+                  style={{ marginRight: "5px" }}
+                >
+                  Lọc
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  autoFocus
+                  onClick={() => {
+                    handleCloseDialogFilter();
+                    setFilter(dataPrev.filter);
+                  }}
+                  style={{ marginLeft: "5px" }}
+                >
+                  Quay lại
+                </Button>
+              </div>
+            </Grid>
+          </Grid>
         </DialogActions>
       </Dialog>
     </div>
