@@ -3,17 +3,18 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import Provider from './store/Provider';
 // import GlobalStyle from "./components/GlobalStyle";
 import { SnackbarProvider, useSnackbar } from "notistack";
 import GlobalStyle from "./components/GlobalStyle";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <GlobalStyle>
-    {/* <Provider> */}
+    <Provider>
     <SnackbarProvider maxSnack={3}>
       <App />
     </SnackbarProvider>
-    {/* </Provider> */}{" "}
+    </Provider>
   </GlobalStyle>
 );
 

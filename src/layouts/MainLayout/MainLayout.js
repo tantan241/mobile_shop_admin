@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import classNames from "classnames/bind";
 import styles from "./MainLayout.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import HomeIcon from "@mui/icons-material/Home";
@@ -26,13 +26,30 @@ import HeadphonesBatteryIcon from "@mui/icons-material/HeadphonesBattery";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { routes } from "~/routes";
+import useStore from "~/store/hooks";
 const cx = classNames.bind(styles);
 function MainLayout() {
+  const [store, dispatch] = useStore();
   const [open, setOpen] = useState([]);
   const [titleAppBar, setTitleAppBar] = useState("TRANG CHỦ");
   const handleClick = (id) => {
     id === open.id ? setOpen({}) : setOpen({ id });
   };
+  const pathNameSplit = window.location.pathname ? window.location.pathname.split("/") : ["", "", ""];
+  const pathName = pathNameSplit[2];
+  useEffect(() => {
+    pathName && pathName === "add"
+      ? setTitleAppBar((prev) => `THÊM MỚI ${prev}`)
+      : pathName
+      ? setTitleAppBar((prev) => {
+          if (prev && !prev.includes("CẬP NHẬP")) {
+            return `CẬP NHẬP ${prev}`;
+          }
+          return prev;
+        })
+      : setTitleAppBar((prev) => prev);
+  }, [store.reload]);
+
   const routers = [
     {
       id: 1,
@@ -106,15 +123,10 @@ function MainLayout() {
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.title} />
-                  {item.children.length > 0 &&
-                    (open.id === item.id ? <ExpandLess /> : <ExpandMore />)}
+                  {item.children.length > 0 && (open.id === item.id ? <ExpandLess /> : <ExpandMore />)}
                 </ListItemButton>
                 {item.children.length > 0 && (
-                  <Collapse
-                    in={open.id === item.id}
-                    timeout="auto"
-                    unmountOnExit
-                  >
+                  <Collapse in={open.id === item.id} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
                       {item.children.map((it) => (
                         <ListItemButton
@@ -147,26 +159,15 @@ function MainLayout() {
                 alignItems: "center",
               }}
             >
-              {/* <div> */}
               <MoreVertIcon></MoreVertIcon>
               {titleAppBar}
-              {/* </div>
-              <div style={{ backgroundColor: "black" }}>
-                <Button>Lưu</Button>
-              </div> */}
             </Typography>
           </AppBar>
           <div style={{ marginTop: "8vh" }}>
             <Routes>
               {routes.map((publicLayout, index) => {
                 const Page = publicLayout.component;
-                return (
-                  <Route
-                    key={index}
-                    path={publicLayout.path}
-                    element={<Page></Page>}
-                  />
-                );
+                return <Route key={index} path={publicLayout.path} element={<Page></Page>} />;
               })}
             </Routes>
           </div>

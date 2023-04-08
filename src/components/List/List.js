@@ -14,7 +14,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { DataGrid, GridPagination, GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./List.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -53,6 +53,7 @@ function List(props) {
   const [openDialgDelete, setOpenDialogDelete] = useState(false);
   const [oneRowDelete, setOneRowDelete] = useState("");
   const [clickDeleteMultiple, setClickDeleteMultiple] = useState(false);
+  const navigate = useNavigate();
   const fakeData = [
     {
       name: "--- Chọn giá trị ---",
@@ -151,7 +152,7 @@ function List(props) {
             <div style={{ display: "flex", alignItems: "center" }}>
               <div>{params.value}</div>
               <div style={{ marginLeft: "auto" }}>
-                <IconButton aria-label="edit" onClick={() => console.log("Edit", params.row)}>
+                <IconButton aria-label="edit" onClick={() => navigate(`${params.row.id}`)}>
                   <EditIcon />
                 </IconButton>
                 <IconButton
@@ -269,7 +270,7 @@ function List(props) {
               </Tooltip>
             </Fab>
           )}
-          <Link to={`${window.location.pathname}/edit`}>
+          <Link to={`${window.location.pathname}/add`}>
             <Fab color="primary" size="small">
               <Tooltip title="Thêm mới">
                 <Add></Add>
