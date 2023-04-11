@@ -7,26 +7,30 @@ import useStore from "~/store/hooks";
 
 function MobilePage() {
   const [store, dispatch] = useStore();
-  // const [brands, setBrands] = useState(async function () {
-  //   return await fetchData(API_GET_ALL_BRAND_FOR_PRODUCT, {}, "GET", true).then((res) => {
-  //     if (res.status === 200) {
-  //       setBrands(res.data);
-  //     }
-  //   });
-  // });
+  const [brands, setBrands] = useState(async function () {
+    return await fetchData(API_GET_ALL_BRAND_FOR_PRODUCT, {}, "GET", true).then((res) => {
+      if (res.status === 200) {
+        setBrands(res.data);
+      }
+    });
+  });
 
-  const mapFunction = useCallback((data) => {
-    return data.map((item) => ({
-      ...item,
-      // brand: brands.find((it) => it.id === item.brand)
-      //   ? brands.find((it) => it.id === parseInt(item.brand)).name
-      //   : "",
-      price: item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VNĐ",
-      discount: item.discount.toString() + " %",
-      type: item.type === 0 ? "Điện Thoại" : item.type === 1 ? "Phụ Kiện" : "",
-      status: item.status == 1 ? "Hoạt động" : "Ngừng hoạt động",
-    }));
-  }, []);
+  const mapFunction = useCallback(
+    (data) => {
+      return data.map((item) => ({
+        ...item,
+        brand:
+          Array.isArray(brands) && brands.find((it) => it.id === item.brand)
+            ? brands.find((it) => it.id === parseInt(item.brand)).name
+            : "",
+        price: item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " VNĐ",
+        discount: item.discount.toString() + " %",
+        type: item.type === 0 ? "Điện Thoại" : item.type === 1 ? "Phụ Kiện" : "",
+        status: item.status == 1 ? "Hoạt động" : "Ngừng hoạt động",
+      }));
+    },
+    [brands]
+  );
   return (
     <div style={{ width: "100%", marginLeft: "20px" }}>
       <List

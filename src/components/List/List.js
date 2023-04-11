@@ -109,7 +109,6 @@ function List(props) {
   }, []);
   // const handleDeleteOneRow = useCallback((data) => {}, []);
   const deleteRows = useCallback((data) => {
-    console.log(data);
     let ids = [];
     if (Array.isArray(data)) {
       data.forEach((item) => {
@@ -131,7 +130,6 @@ function List(props) {
 
   const handleFieldSearchChange = useCallback(
     (value) => {
-      console.log(value);
       setFieldSearch(value);
       const data = dataSearch.find((item) => item.value === value);
       if (data.type === "select") {
@@ -216,7 +214,7 @@ function List(props) {
   const handleSelectionModelChange = useCallback(
     (newSelectionModel) => {
       const selectedRows = rows.filter((row) => newSelectionModel.includes(row.id));
-      console.log(selectedRows);
+
       setRowsSelect(selectedRows);
     },
     [rows]
@@ -258,7 +256,7 @@ function List(props) {
               </Button>
               <div style={{ margin: "0 5px" }}></div>
               <Button color="primary" variant="contained" size="small" onClick={() => setOpenDialogFilter(true)}>
-                Lọc sản phẩm
+                Sắp xếp sản phẩm
               </Button>
               {dataPrev.fieldSearch !== "default" && valueSearch !== "default" && (
                 <Button
@@ -428,6 +426,7 @@ function List(props) {
                     variant="outlined"
                     size="small"
                     // style={{ margin: "0 10px" }}
+                    value={valueSearch === "default" ? "" : valueSearch}
                     onChange={(e) => {
                       setValueSearch(e.target.value);
                     }}
@@ -472,7 +471,7 @@ function List(props) {
           setFilter(dataPrev.filter);
         }}
       >
-        <DialogTitle>Lọc sản phẩm</DialogTitle>
+        <DialogTitle>Sắp xếp sản phẩm</DialogTitle>
 
         <DialogActions style={{ width: "500px", margin: "30px" }}>
           <Grid container spacing={2}>
