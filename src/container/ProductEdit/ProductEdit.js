@@ -14,17 +14,24 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { API_ADD_PRODUCT, API_GET_ALL_BRAND_FOR_PRODUCT, API_GET_ONE_PRODUCT, API_UPLOAD_FILE, URL_IMAGE } from "~/api";
-import { fetchData } from "~/common";
+import { fetchData, handleClickVariant } from "~/common";
 import InputUploadImage from "~/components/InputUploadImage/InputUploadImage";
 import { ACCESS_TOKEN } from "~/constants";
 import { actions } from "~/store";
 import useStore from "~/store/hooks";
-
-function MobilePageEdit() {
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import "./ProductEdit.css";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+function ProductEdit() {
   const [store, dispatch] = useStore();
+  const navigate = useNavigate();
   const [file, setFile] = useState();
+  const [nameImage, setNameImage] = useState("");
+  const [nameImages, setNameImages] = useState([]);
   const [files, setFiles] = useState({ file1: "", file2: "", file3: "", file4: "", file5: "", file6: "" });
-  const [urls, setUrl] = useState({ file: "", file1: "", file2: "", file3: "", file4: "", file5: "", file6: "" });
+  const [urls, setUrls] = useState({ file: "", file1: "", file2: "", file3: "", file4: "", file5: "", file6: "" });
   const pathNameSplit = window.location.pathname ? window.location.pathname.split("/") : ["", "", ""];
   const [dialogImage, setDialogImage] = useState({
     open: false,
@@ -76,6 +83,7 @@ function MobilePageEdit() {
         if (res.status === 200) {
           setLocalValues({
             id: res.data.id,
+            description: res.data.description,
             name: res.data.name,
             price: res.data.price,
             discount: res.data.discount,
@@ -85,28 +93,37 @@ function MobilePageEdit() {
             number: res.data.number,
             status: res.data.status,
           });
-          setUrl({ file: `${URL_IMAGE}/${res.data.image}` });
+          setNameImage(res.data.image);
+          setNameImages(JSON.parse(res.data.images));
+          setUrls({ file: `${URL_IMAGE}/${res.data.image}` });
           setSpecifications(res.data.specifications);
+          JSON.parse(res.data.images).forEach((item, index) => {
+            setUrls((prev) => ({ ...prev, [`file${index + 1}`]: `${URL_IMAGE}/${item}` }));
+          });
         }
       });
     }
   }, []);
+
   const handleImageClick = useCallback((value) => {
     setDialogImage(value);
   }, []);
-  const handleFilesChange = useCallback((name, value) => {
-    if (value) {
-
-      setUrl((prev) => ({ ...prev, [name]: URL.createObjectURL(value) }));
-      setFiles((prev) => ({ ...prev, [name]: value }));
-    }
-  }, []);
+  const handleFilesChange = useCallback(
+    (name, value) => {
+      if (value) {
+        setUrls((prev) => ({ ...prev, [name]: URL.createObjectURL(value) }));
+        setFiles((prev) => ({ ...prev, [name]: value }));
+      }
+    },
+    [localValues]
+  );
   const handleInputMainChange = useCallback((name, value) => {
     setLocalValues((prev) => ({ ...prev, [name]: value }));
   }, []);
 
   async function handleSave() {
     const token = JSON.parse(localStorage.getItem(ACCESS_TOKEN)) ? JSON.parse(localStorage.getItem(ACCESS_TOKEN)) : "";
+
     let data = {
       ...localValues,
       discount: localValues.discount * 1,
@@ -122,26 +139,60 @@ function MobilePageEdit() {
       headers: { Authorization: "Bearer " + token },
       body: formData,
     });
-    const response = await uploadImage.json();
-    if (response.status === 200) {
-      data.image = response.fileName;
 
+    const response = await uploadImage.json();
+    if (response.status === 200 || urls.file) {
+      if (response.status === 200) {
+        data.image = response.fileName;
+      } else {
+        data.image = nameImage;
+      }
       const image_promises = [];
+      const arrSwap = [];
+
       for (const item in files) {
         const form_data = new FormData();
         form_data.append("file", files[item]);
-        image_promises.push(
-          fetch(API_UPLOAD_FILE, {
-            method: "POST",
-            headers: { Authorization: "Bearer " + token },
-            body: form_data,
-          }).then((res) => res.json())
-        );
+
+        if (files[item]) {
+          const itemReplace = item.replace("file", "") * 1;
+
+          arrSwap.push(itemReplace - 1);
+          image_promises.push(
+            fetch(API_UPLOAD_FILE, {
+              method: "POST",
+              headers: { Authorization: "Bearer " + token },
+              body: form_data,
+            }).then((res) => res.json())
+          );
+        }
       }
+
       const images_data = await Promise.all(image_promises);
       const files_data = images_data.filter((data) => data.status === 200).map((data) => data.fileName);
-      data.images = JSON.stringify(files_data);
-      await fetchData(API_ADD_PRODUCT, data, "POST", true);
+      let newArr = files_data;
+      if (localValues.id) {
+        nameImages.forEach((item, index) => {
+          arrSwap.forEach((it, idx) => {
+            if (it === index) {
+              newArr = files_data.filter((i) => i !== files_data[idx]);
+              return (nameImages[index] = files_data[idx]);
+            }
+          });
+        });
+      }
+
+      if (localValues.id && nameImages.length > 0) {
+        data.images = JSON.stringify(nameImages.concat(newArr));
+      } else {
+        data.images = JSON.stringify(files_data);
+      }
+      await fetchData(API_ADD_PRODUCT, data, "POST", true).then((res) => {
+        if (res.status === 200) {
+          handleClickVariant("success", res.messenger, enqueueSnackbar);
+          navigate("/product");
+        }
+      });
     }
   }
   return (
@@ -160,7 +211,7 @@ function MobilePageEdit() {
               Hủy bỏ
             </Button>
             <div style={{ margin: "0 5px" }}></div>
-            <Button variant="contained" onClick={handleSave}>
+            <Button variant="contained" onClick={() => handleSave()}>
               Lưu
             </Button>
           </div>
@@ -260,9 +311,9 @@ function MobilePageEdit() {
                   <MenuItem value={0}>Ngừng hoạt động</MenuItem>
                 </TextField>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={3}>
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <InputUploadImage label={"Chọn ảnh"}>
                       <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
                         Upload
@@ -272,8 +323,7 @@ function MobilePageEdit() {
                           multiple
                           type="file"
                           onChange={(e) => {
-                            console.log(e);
-                            setUrl((prev) =>
+                            setUrls((prev) =>
                               e.target.files[0] ? { ...prev, file: URL.createObjectURL(e.target.files[0]) } : prev
                             );
                             setFile(e.target.files[0]);
@@ -295,87 +345,114 @@ function MobilePageEdit() {
             </Grid>
           </Box>
         </Grid>
+
         <Grid item xs={12}>
           <Box>
             <Typography variant="h6" style={{ marginBottom: "20px" }}>
-              Thông số
+              Mô tả sản phẩm
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="RAM"
-                  value={getValueFiled("ram")}
-                  onChange={(e) => handleSpecificationsChange("ram", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="ROM"
-                  value={getValueFiled("rom")}
-                  onChange={(e) => handleSpecificationsChange("rom", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="Camera trước"
-                  value={getValueFiled("front_camera")}
-                  onChange={(e) => handleSpecificationsChange("front_camera", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="Camera sau"
-                  value={getValueFiled("rear_camera")}
-                  onChange={(e) => handleSpecificationsChange("rear_camera", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="Chip"
-                  value={getValueFiled("chip")}
-                  onChange={(e) => handleSpecificationsChange("chip", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="Màn hình"
-                  value={getValueFiled("display")}
-                  onChange={(e) => handleSpecificationsChange("display", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="Hệ điều hành"
-                  value={getValueFiled("system")}
-                  onChange={(e) => handleSpecificationsChange("system", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="Sim"
-                  value={getValueFiled("sim")}
-                  onChange={(e) => handleSpecificationsChange("sim", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  label="Pin"
-                  value={getValueFiled("battery")}
-                  onChange={(e) => handleSpecificationsChange("battery", e.target.value)}
-                ></TextField>
+              <Grid item xs={12}>
+                <CKEditor
+                  style={{ height: "200px", minHeight: "200px" }}
+                  editor={ClassicEditor}
+                  data={localValues.description ? localValues.description : ""}
+                  onReady={(editor) => {
+                    // You can store the "editor" and use when it is needed.
+                    console.log("Editor is ready to use!", editor);
+                  }}
+                  onChange={(event, editor) => {
+                    const data = editor.getData();
+                    handleInputMainChange("description", data);
+                  }}
+                />
               </Grid>
             </Grid>
           </Box>
         </Grid>
+        {localValues.type === 0 && (
+          <Grid item xs={12}>
+            <Box>
+              <Typography variant="h6" style={{ marginBottom: "20px" }}>
+                Thông số
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="RAM"
+                    value={getValueFiled("ram")}
+                    onChange={(e) => handleSpecificationsChange("ram", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="ROM"
+                    value={getValueFiled("rom")}
+                    onChange={(e) => handleSpecificationsChange("rom", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Camera trước"
+                    value={getValueFiled("front_camera")}
+                    onChange={(e) => handleSpecificationsChange("front_camera", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Camera sau"
+                    value={getValueFiled("rear_camera")}
+                    onChange={(e) => handleSpecificationsChange("rear_camera", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Chip"
+                    value={getValueFiled("chip")}
+                    onChange={(e) => handleSpecificationsChange("chip", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Màn hình"
+                    value={getValueFiled("display")}
+                    onChange={(e) => handleSpecificationsChange("display", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Hệ điều hành"
+                    value={getValueFiled("system")}
+                    onChange={(e) => handleSpecificationsChange("system", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Sim"
+                    value={getValueFiled("sim")}
+                    onChange={(e) => handleSpecificationsChange("sim", e.target.value)}
+                  ></TextField>
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Pin"
+                    value={getValueFiled("battery")}
+                    onChange={(e) => handleSpecificationsChange("battery", e.target.value)}
+                  ></TextField>
+                </Grid>
+              </Grid>
+            </Box>
+          </Grid>
+        )}
 
         <Grid item xs={12}>
           <Box>
@@ -450,12 +527,11 @@ function MobilePageEdit() {
                       )}
                     </InputUploadImage>
                   </Grid>
-                 
                 </Grid>
               </Grid>
               <Grid item xs={6}>
                 <Grid container spacing={2}>
-                <Grid item xs={8}>
+                  <Grid item xs={8}>
                     <InputUploadImage label={"Chọn ảnh"}>
                       <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
                         Upload
@@ -481,7 +557,7 @@ function MobilePageEdit() {
               </Grid>
               <Grid item xs={6}>
                 <Grid container spacing={2}>
-                <Grid item xs={8}>
+                  <Grid item xs={8}>
                     <InputUploadImage label={"Chọn ảnh"}>
                       <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
                         Upload
@@ -507,7 +583,7 @@ function MobilePageEdit() {
               </Grid>
               <Grid item xs={6}>
                 <Grid container spacing={2}>
-                <Grid item xs={8}>
+                  <Grid item xs={8}>
                     <InputUploadImage label={"Chọn ảnh"}>
                       <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
                         Upload
@@ -533,7 +609,7 @@ function MobilePageEdit() {
               </Grid>
               <Grid item xs={6}>
                 <Grid container spacing={2}>
-                <Grid item xs={8}>
+                  <Grid item xs={8}>
                     <InputUploadImage label={"Chọn ảnh"}>
                       <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
                         Upload
@@ -573,4 +649,4 @@ function MobilePageEdit() {
   );
 }
 
-export default MobilePageEdit;
+export default ProductEdit;

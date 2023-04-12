@@ -76,18 +76,18 @@ function MainLayout() {
           to: "/brand",
           icon: <BrandingWatermarkIcon />,
         },
-        {
-          id: 2,
-          title: "ĐIỆN THOẠI",
-          to: "/mobile",
-          icon: <PhoneAndroidIcon />,
-        },
-        {
-          id: 3,
-          title: "PHỤ KIỆN",
-          to: "/accessory",
-          icon: <HeadphonesBatteryIcon />,
-        },
+        // {
+        //   id: 2,
+        //   title: "ĐIỆN THOẠI",
+        //   to: "/mobile",
+        //   icon: <PhoneAndroidIcon />,
+        // },
+        // {
+        //   id: 3,
+        //   title: "PHỤ KIỆN",
+        //   to: "/accessory",
+        //   icon: <HeadphonesBatteryIcon />,
+        // },
       ],
     },
     {

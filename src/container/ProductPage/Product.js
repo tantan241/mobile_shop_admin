@@ -5,7 +5,7 @@ import List from "~/components/List/List";
 import { actions } from "~/store";
 import useStore from "~/store/hooks";
 
-function MobilePage() {
+function Product() {
   const [store, dispatch] = useStore();
   const [brands, setBrands] = useState(async function () {
     return await fetchData(API_GET_ALL_BRAND_FOR_PRODUCT, {}, "GET", true).then((res) => {
@@ -46,4 +46,4 @@ function MobilePage() {
   );
 }
 
-export default MobilePage;
+export default Product;

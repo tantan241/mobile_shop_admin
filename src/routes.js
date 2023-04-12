@@ -1,8 +1,8 @@
 import { Dashboard } from "@mui/icons-material";
 import BrandPage from "./container/BrandPage/BrandPage";
 import BrandPageEdit from "./container/BrandPageEdit/BrandPageEdit";
-import MobilePage from "./container/MobilePage/MobilePage";
-import MobilePageEdit from "./container/MobilePageEdit/MobilePageEdit";
+import ProductEdit from "./container/ProductEdit/ProductEdit";
+import Product from "./container/ProductPage/Product";
 
 export const routes = [
   {
@@ -14,11 +14,11 @@ export const routes = [
     component: BrandPageEdit,
   },
   {
-    path: "/mobile",
-    component: MobilePage,
+    path: "/product",
+    component: Product,
   },
   {
-    path: "/mobile/:id",
-    component: MobilePageEdit,
+    path: "/product/:id",
+    component: ProductEdit,
   },
 ];

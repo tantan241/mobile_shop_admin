@@ -20,8 +20,9 @@ import "./List.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchData } from "~/common";
+import { fetchData, handleClickVariant } from "~/common";
 import CloseIcon from "@mui/icons-material/Close";
+import { enqueueSnackbar } from "notistack";
 function CustomFooter(props) {
   const { count, page, handleChangePage, rowsPerPage, handleChangeRowsPerPage, rowsPerPageOptions } = props;
   return (
@@ -123,6 +124,8 @@ function List(props) {
       if (res.status === 200) {
         setReload(new Date() * 1);
         setOpenDialogDelete(false);
+        handleClickVariant(res.status === 200 ? "success" : "error", res.messenger, enqueueSnackbar);
+
       }
     });
   }, []);
