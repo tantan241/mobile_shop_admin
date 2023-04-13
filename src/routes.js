@@ -3,6 +3,7 @@ import BrandPage from "./container/BrandPage/BrandPage";
 import BrandPageEdit from "./container/BrandPageEdit/BrandPageEdit";
 import ProductEdit from "./container/ProductEdit/ProductEdit";
 import Product from "./container/ProductPage/Product";
+import OrderPage from "./container/OrderPage/OrderPage";
 
 export const routes = [
   {
@@ -20,5 +21,9 @@ export const routes = [
   {
     path: "/product/:id",
     component: ProductEdit,
+  },
+  {
+    path: "/order",
+    component: OrderPage,
   },
 ];

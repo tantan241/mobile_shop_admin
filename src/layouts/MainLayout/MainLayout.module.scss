@@ -15,10 +15,13 @@
     // height: 100vh;
 }
 .header-nav {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
 }
 .header-text {
-    font-size: 1.8rem;
+    flex: 1;
+    font-size: 2rem;
 }

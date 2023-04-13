@@ -8,6 +8,9 @@ export const API_UPLOAD_FILE = `${API_FILES}/upload-file`;
 export const API_ADMIN_LOGIN = `${URL}/admin/login`;
 
 export const API_ADMIN_PRODUCT = `${URL}/product/admin`;
+
+export const API_ADMIN_ORDER = `${URL}/order/admin`;
+
 // export const API_ADMIN_GET_BRAND = `${API_ADMIN_PRODUCT}/get-brand`;
 
 export const API_GET_ONE_BRAND = `${API_ADMIN_PRODUCT}/get-one-brand`;

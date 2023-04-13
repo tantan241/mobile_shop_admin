@@ -125,7 +125,6 @@ function List(props) {
         setReload(new Date() * 1);
         setOpenDialogDelete(false);
         handleClickVariant(res.status === 200 ? "success" : "error", res.messenger, enqueueSnackbar);
-
       }
     });
   }, []);
@@ -182,25 +181,30 @@ function List(props) {
           headerName: "Hành  động",
           description: "Hành động",
           sortable: false,
-          flex: 0.8,
+          flex: 0.9,
           filterable: false,
           renderCell: (params) => (
             <div style={{ display: "flex", alignItems: "center" }}>
               <div>{params.value}</div>
-              <div style={{ marginLeft: "auto" }}>
-                <IconButton aria-label="edit" onClick={() => navigate(`${params.row.id}`)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  aria-label="delete"
-                  onClick={() => {
-                    setClickDeleteMultiple(false);
-                    setOneRowDelete(params.row);
-                    setOpenDialogDelete(true);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
+              <div style={{ marginLeft: "auto", display: "flex" }}>
+                <Fab size="small" color="primary">
+                  <IconButton  aria-label="edit" onClick={() => navigate(`${params.row.id}`)}>
+                    <EditIcon style={{color: "white"}}/>
+                  </IconButton>
+                </Fab>
+                <div style={{ margin: "0 4px" }}></div>
+                <Fab size="small" color="error">
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => {
+                      setClickDeleteMultiple(false);
+                      setOneRowDelete(params.row);
+                      setOpenDialogDelete(true);
+                    }}
+                  >
+                    <DeleteIcon style={{color: "white"}} />
+                  </IconButton>
+                </Fab>
               </div>
             </div>
           ),
@@ -255,11 +259,11 @@ function List(props) {
           {dataSearch.length > 0 && (
             <>
               <Button color="primary" variant="contained" size="small" onClick={() => setOpenDialogSearch(true)}>
-                Tìm kiếm sản phẩm
+                Tìm kiếm
               </Button>
               <div style={{ margin: "0 5px" }}></div>
               <Button color="primary" variant="contained" size="small" onClick={() => setOpenDialogFilter(true)}>
-                Sắp xếp sản phẩm
+                Sắp xếp
               </Button>
               {dataPrev.fieldSearch !== "default" && valueSearch !== "default" && (
                 <Button
@@ -334,6 +338,7 @@ function List(props) {
         //   console.log(model);
         //   setSortModel(model);
         // }}
+        disableColumnMenu
         components={{
           Footer: () => (
             <CustomFooter

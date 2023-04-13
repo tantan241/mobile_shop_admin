@@ -40,7 +40,7 @@ function Product() {
         mapFunction={mapFunction}
         limit={100}
         skip={5}
-        rowsPerPageOptions={[8, 30, 100]}
+        rowsPerPageOptions={[10, 30, 100]}
       ></List>
     </div>
   );
