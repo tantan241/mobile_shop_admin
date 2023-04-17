@@ -40,7 +40,7 @@ function CustomFooter(props) {
 }
 
 function List(props) {
-  const { height, url, mapFunction, rowsPerPageOptions, model } = props;
+  const { height, url, mapFunction, rowsPerPageOptions, model, actions, cellCustom, disableAdd, customEdit, reloadOut } = props;
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
   const [rowsSelect, setRowsSelect] = useState([]);
@@ -108,7 +108,6 @@ function List(props) {
   const handleCloseDialogDelete = useCallback(() => {
     setOpenDialogDelete(false);
   }, []);
-  // const handleDeleteOneRow = useCallback((data) => {}, []);
   const deleteRows = useCallback((data) => {
     let ids = [];
     if (Array.isArray(data)) {
@@ -176,40 +175,56 @@ function List(props) {
         setPageInfo(res.pageInfo);
         setDataSearch(res.dataSearch);
         setDataFilter(res.dataFilter);
-        res.columns.push({
+        let columns = res.columns;
+
+        columns.push({
           field: "action",
           headerName: "Hành  động",
           description: "Hành động",
           sortable: false,
           flex: 0.9,
           filterable: false,
-          renderCell: (params) => (
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <div>{params.value}</div>
-              <div style={{ marginLeft: "auto", display: "flex" }}>
-                <Fab size="small" color="primary">
-                  <IconButton  aria-label="edit" onClick={() => navigate(`${params.row.id}`)}>
-                    <EditIcon style={{color: "white"}}/>
-                  </IconButton>
-                </Fab>
-                <div style={{ margin: "0 4px" }}></div>
-                <Fab size="small" color="error">
-                  <IconButton
-                    aria-label="delete"
-                    onClick={() => {
-                      setClickDeleteMultiple(false);
-                      setOneRowDelete(params.row);
-                      setOpenDialogDelete(true);
-                    }}
-                  >
-                    <DeleteIcon style={{color: "white"}} />
-                  </IconButton>
-                </Fab>
-              </div>
-            </div>
-          ),
+          renderCell: actions
+            ? actions
+            : (params) => (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <div>{params.value}</div>
+                  <div style={{ marginLeft: "auto", display: "flex" }}>
+                    {customEdit ? (
+                      customEdit(params)
+                    ) : (
+                      <Fab size="small" color="primary">
+                        <IconButton aria-label="edit" onClick={() => navigate(`${params.row.id}`)}>
+                          <EditIcon style={{ color: "white" }} />
+                        </IconButton>
+                      </Fab>
+                    )}
+
+                    <div style={{ margin: "0 4px" }}></div>
+                    <Fab size="small" color="error">
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => {
+                          setClickDeleteMultiple(false);
+                          setOneRowDelete(params.row);
+                          setOpenDialogDelete(true);
+                        }}
+                      >
+                        <DeleteIcon style={{ color: "white" }} />
+                      </IconButton>
+                    </Fab>
+                  </div>
+                </div>
+              ),
         });
-        setColumns(res.columns);
+        if (cellCustom) {
+          if (cellCustom.field && cellCustom.data) {
+            columns = columns.map((item) =>
+              item.field === cellCustom.field ? { ...item, renderCell: cellCustom.data } : item
+            );
+          }
+        }
+        setColumns(columns);
         let rowsList = res.rows;
         if (mapFunction && typeof mapFunction === "function") {
           rowsList = mapFunction(rowsList);
@@ -217,7 +232,7 @@ function List(props) {
         setRows(rowsList);
       }
     });
-  }, [url, rowsPerPage, page, mapFunction, model, reload]);
+  }, [url, rowsPerPage, page, mapFunction, model, reload,reloadOut]);
   const handleSelectionModelChange = useCallback(
     (newSelectionModel) => {
       const selectedRows = rows.filter((row) => newSelectionModel.includes(row.id));
@@ -228,15 +243,9 @@ function List(props) {
   );
 
   const handleCloseDialogSearch = useCallback(() => {
-    // setValueSearch("default");
-    // setFieldSearch("default");
     setOpenDialogSearch(false);
   }, []);
   const handleCloseDialogFilter = useCallback(() => {
-    // setFilter({
-    //   field: "name",
-    //   sort: "asc",
-    // });
     setOpenDialogFilter(false);
   }, []);
   return (
@@ -314,13 +323,17 @@ function List(props) {
               </Tooltip>
             </Fab>
           )}
-          <Link to={`${window.location.pathname}/add`}>
-            <Fab color="primary" size="small">
-              <Tooltip title="Thêm mới">
-                <Add></Add>
-              </Tooltip>
-            </Fab>
-          </Link>
+          {disableAdd ? (
+            ""
+          ) : (
+            <Link to={`${window.location.pathname}/add`}>
+              <Fab color="primary" size="small">
+                <Tooltip title="Thêm mới">
+                  <Add></Add>
+                </Tooltip>
+              </Fab>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -333,11 +346,6 @@ function List(props) {
         checkboxSelection
         onRowSelectionModelChange={handleSelectionModelChange}
         hideFooterPagination
-        // sortModel={sortModel}
-        // onSortModelChange={(model) => {
-        //   console.log(model);
-        //   setSortModel(model);
-        // }}
         disableColumnMenu
         components={{
           Footer: () => (

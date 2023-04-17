@@ -9,6 +9,8 @@ import {
   InputLabel,
   MenuItem,
   Paper,
+  Tab,
+  Tabs,
   TextField,
   Typography,
 } from "@mui/material";
@@ -24,8 +26,10 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import "./ProductEdit.css";
 import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
+import CommentPage from "../CommentPage/CommentPage";
 function ProductEdit() {
   const [store, dispatch] = useStore();
+  const [tab, setTab] = useState(1);
   const navigate = useNavigate();
   const [file, setFile] = useState();
   const [nameImage, setNameImage] = useState("");
@@ -196,295 +200,300 @@ function ProductEdit() {
     }
   }
   return (
-    <Paper style={{ padding: "50px" }}>
-      <Grid container spacing={4}>
-        <Grid item xs={12}>
-          <div style={{ display: "flex", flexDirection: "row-reverse" }}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => {
-                dispatch(actions.setReload(new Date() * 1));
-                // navigate("/brand");
-              }}
-            >
-              Hủy bỏ
-            </Button>
-            <div style={{ margin: "0 5px" }}></div>
-            <Button variant="contained" onClick={() => handleSave()}>
-              Lưu
-            </Button>
-          </div>
-        </Grid>
-        <Grid item xs={12}>
-          <Box>
-            <Typography variant="h6" style={{ marginBottom: "20px" }}>
-              Thông tin chính
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Tên sản phẩm"
-                  value={localValues.name}
-                  onChange={(e) => handleInputMainChange("name", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  label="Giá sản phẩm"
-                  type="number"
-                  value={localValues.price}
-                  onChange={(e) => handleInputMainChange("price", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  label="Giảm giá"
-                  type="number"
-                  value={localValues.discount}
-                  onChange={(e) => handleInputMainChange("discount", e.target.value)}
-                ></TextField>
-              </Grid>
-
-              <Grid item xs={3}>
-                <TextField
-                  select
-                  fullWidth
-                  value={localValues.type}
-                  label="Loại sản phẩm"
-                  onChange={(e) => handleInputMainChange("type", e.target.value)}
-                >
-                  <MenuItem value={0}>Điện thoại</MenuItem>
-                  <MenuItem value={1}>Phụ kiện</MenuItem>
-                </TextField>
-              </Grid>
-              {localValues.type === 1 ? (
+    <Paper style={{ padding: "20px" }}>
+      <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+        <Tab value={1} label="THÔNG TIN"></Tab>
+        <Tab value={2} label="BÌNH LUẬN"></Tab>
+      </Tabs>
+      {tab === 1 && (
+        <Grid container spacing={4} style={{ marginTop: "20px" }}>
+          <Grid item xs={12}>
+            <div style={{ display: "flex", flexDirection: "row-reverse" }}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  dispatch(actions.setReload(new Date() * 1));
+                  // navigate("/brand");
+                }}
+              >
+                Hủy bỏ
+              </Button>
+              <div style={{ margin: "0 5px" }}></div>
+              <Button variant="contained" onClick={() => handleSave()}>
+                Lưu
+              </Button>
+            </div>
+          </Grid>
+          <Grid item xs={12}>
+            <Box>
+              <Typography variant="h6" style={{ marginBottom: "5x" }}>
+                Thông tin chính
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    label="Tên sản phẩm"
+                    value={localValues.name}
+                    onChange={(e) => handleInputMainChange("name", e.target.value)}
+                  ></TextField>
+                </Grid>
                 <Grid item xs={3}>
                   <TextField
                     fullWidth
-                    value={localValues.typeAccessory}
-                    label="Loại phụ kiện"
-                    onChange={(e) => handleInputMainChange("typeAccessory", e.target.value)}
+                    label="Giá sản phẩm"
+                    type="number"
+                    value={localValues.price}
+                    onChange={(e) => handleInputMainChange("price", e.target.value)}
                   ></TextField>
                 </Grid>
-              ) : (
-                ""
-              )}
+                <Grid item xs={3}>
+                  <TextField
+                    fullWidth
+                    label="Giảm giá"
+                    type="number"
+                    value={localValues.discount}
+                    onChange={(e) => handleInputMainChange("discount", e.target.value)}
+                  ></TextField>
+                </Grid>
 
-              <Grid item xs={3}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Thương hiệu"
-                  value={localValues.brand}
-                  onChange={(e) => handleInputMainChange("brand", e.target.value)}
-                >
-                  {brands.map((item) => (
-                    <MenuItem key={item.value} value={item.value}>
-                      {item.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-
-              <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  label="Số lượng còn"
-                  type="number"
-                  value={localValues.number}
-                  onChange={(e) => handleInputMainChange("number", e.target.value)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Trạng Thái"
-                  value={localValues.status}
-                  onChange={(e) => handleInputMainChange("status", e.target.value)}
-                >
-                  <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={0}>Ngừng hoạt động</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={3}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <InputUploadImage label={"Chọn ảnh"}>
-                      <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
-                        Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={(e) => {
-                            setUrls((prev) =>
-                              e.target.files[0] ? { ...prev, file: URL.createObjectURL(e.target.files[0]) } : prev
-                            );
-                            setFile(e.target.files[0]);
-                          }}
-                        />
-                      </Button>
-                      {(urls.file || file) && (
-                        <img
-                          alt=""
-                          src={urls.file}
-                          onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
-                          style={{ width: " 100%", height: "100%" }}
-                        />
-                      )}
-                    </InputUploadImage>
+                <Grid item xs={3}>
+                  <TextField
+                    select
+                    fullWidth
+                    value={localValues.type}
+                    label="Loại sản phẩm"
+                    onChange={(e) => handleInputMainChange("type", e.target.value)}
+                  >
+                    <MenuItem value={0}>Điện thoại</MenuItem>
+                    <MenuItem value={1}>Phụ kiện</MenuItem>
+                  </TextField>
+                </Grid>
+                {localValues.type === 1 ? (
+                  <Grid item xs={3}>
+                    <TextField
+                      fullWidth
+                      value={localValues.typeAccessory}
+                      label="Loại phụ kiện"
+                      onChange={(e) => handleInputMainChange("typeAccessory", e.target.value)}
+                    ></TextField>
                   </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
+                ) : (
+                  ""
+                )}
 
-        <Grid item xs={12}>
-          <Box>
-            <Typography variant="h6" style={{ marginBottom: "20px" }}>
-              Mô tả sản phẩm
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <CKEditor
-                  style={{ height: "200px", minHeight: "200px" }}
-                  editor={ClassicEditor}
-                  data={localValues.description ? localValues.description : ""}
-                  onReady={(editor) => {
-                    // You can store the "editor" and use when it is needed.
-                    console.log("Editor is ready to use!", editor);
-                  }}
-                  onChange={(event, editor) => {
-                    const data = editor.getData();
-                    handleInputMainChange("description", data);
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
-        {localValues.type === 0 && (
-          <Grid item xs={12}>
-            <Box>
-              <Typography variant="h6" style={{ marginBottom: "20px" }}>
-                Thông số
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Thương hiệu"
+                    value={localValues.brand}
+                    onChange={(e) => handleInputMainChange("brand", e.target.value)}
+                  >
+                    {brands.map((item) => (
+                      <MenuItem key={item.value} value={item.value}>
+                        {item.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={3}>
                   <TextField
                     fullWidth
-                    label="RAM"
-                    value={getValueFiled("ram")}
-                    onChange={(e) => handleSpecificationsChange("ram", e.target.value)}
+                    label="Số lượng còn"
+                    type="number"
+                    value={localValues.number}
+                    onChange={(e) => handleInputMainChange("number", e.target.value)}
                   ></TextField>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                   <TextField
+                    select
                     fullWidth
-                    label="ROM"
-                    value={getValueFiled("rom")}
-                    onChange={(e) => handleSpecificationsChange("rom", e.target.value)}
-                  ></TextField>
+                    label="Trạng Thái"
+                    value={localValues.status}
+                    onChange={(e) => handleInputMainChange("status", e.target.value)}
+                  >
+                    <MenuItem value={1}>Hoạt động</MenuItem>
+                    <MenuItem value={0}>Ngừng hoạt động</MenuItem>
+                  </TextField>
                 </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Camera trước"
-                    value={getValueFiled("front_camera")}
-                    onChange={(e) => handleSpecificationsChange("front_camera", e.target.value)}
-                  ></TextField>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Camera sau"
-                    value={getValueFiled("rear_camera")}
-                    onChange={(e) => handleSpecificationsChange("rear_camera", e.target.value)}
-                  ></TextField>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Chip"
-                    value={getValueFiled("chip")}
-                    onChange={(e) => handleSpecificationsChange("chip", e.target.value)}
-                  ></TextField>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Màn hình"
-                    value={getValueFiled("display")}
-                    onChange={(e) => handleSpecificationsChange("display", e.target.value)}
-                  ></TextField>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Hệ điều hành"
-                    value={getValueFiled("system")}
-                    onChange={(e) => handleSpecificationsChange("system", e.target.value)}
-                  ></TextField>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Sim"
-                    value={getValueFiled("sim")}
-                    onChange={(e) => handleSpecificationsChange("sim", e.target.value)}
-                  ></TextField>
-                </Grid>
-                <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Pin"
-                    value={getValueFiled("battery")}
-                    onChange={(e) => handleSpecificationsChange("battery", e.target.value)}
-                  ></TextField>
+                <Grid item xs={3}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <InputUploadImage label={"Chọn ảnh"}>
+                        <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
+                          Upload
+                          <input
+                            hidden
+                            accept="image/*"
+                            multiple
+                            type="file"
+                            onChange={(e) => {
+                              setUrls((prev) =>
+                                e.target.files[0] ? { ...prev, file: URL.createObjectURL(e.target.files[0]) } : prev
+                              );
+                              setFile(e.target.files[0]);
+                            }}
+                          />
+                        </Button>
+                        {(urls.file || file) && (
+                          <img
+                            alt=""
+                            src={urls.file}
+                            onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
+                            style={{ width: " 100%", height: "100%" }}
+                          />
+                        )}
+                      </InputUploadImage>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </Box>
           </Grid>
-        )}
 
-        <Grid item xs={12}>
-          <Box>
-            <Typography variant="h6" style={{ marginBottom: "20px" }}>
-              Hình ảnh chi tiết
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
+          <Grid item xs={12}>
+            <Box>
+              <Typography variant="h6" style={{ marginBottom: "20px" }}>
+                Mô tả sản phẩm
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <CKEditor
+                    style={{ height: "200px", minHeight: "200px" }}
+                    editor={ClassicEditor}
+                    data={localValues.description ? localValues.description : ""}
+                    onReady={(editor) => {
+                      // You can store the "editor" and use when it is needed.
+                      console.log("Editor is ready to use!", editor);
+                    }}
+                    onChange={(event, editor) => {
+                      const data = editor.getData();
+                      handleInputMainChange("description", data);
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </Grid>
+          {localValues.type === 0 && (
+            <Grid item xs={12}>
+              <Box>
+                <Typography variant="h6" style={{ marginBottom: "20px" }}>
+                  Thông số
+                </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <InputUploadImage label={"Chọn ảnh"}>
-                      <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
-                        Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={(e) => handleFilesChange("file1", e.target.files[0])}
-                        />
-                      </Button>
-                      {urls.file1 && (
-                        <img
-                          alt=""
-                          src={urls.file1}
-                          onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
-                          style={{ width: " 100%" }}
-                        />
-                      )}
-                    </InputUploadImage>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="RAM"
+                      value={getValueFiled("ram")}
+                      onChange={(e) => handleSpecificationsChange("ram", e.target.value)}
+                    ></TextField>
                   </Grid>
-                  {/* <Grid item xs={8}>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="ROM"
+                      value={getValueFiled("rom")}
+                      onChange={(e) => handleSpecificationsChange("rom", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Camera trước"
+                      value={getValueFiled("front_camera")}
+                      onChange={(e) => handleSpecificationsChange("front_camera", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Camera sau"
+                      value={getValueFiled("rear_camera")}
+                      onChange={(e) => handleSpecificationsChange("rear_camera", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Chip"
+                      value={getValueFiled("chip")}
+                      onChange={(e) => handleSpecificationsChange("chip", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Màn hình"
+                      value={getValueFiled("display")}
+                      onChange={(e) => handleSpecificationsChange("display", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Hệ điều hành"
+                      value={getValueFiled("system")}
+                      onChange={(e) => handleSpecificationsChange("system", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Sim"
+                      value={getValueFiled("sim")}
+                      onChange={(e) => handleSpecificationsChange("sim", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Pin"
+                      value={getValueFiled("battery")}
+                      onChange={(e) => handleSpecificationsChange("battery", e.target.value)}
+                    ></TextField>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+          )}
+
+          <Grid item xs={12}>
+            <Box>
+              <Typography variant="h6" style={{ marginBottom: "20px" }}>
+                Hình ảnh chi tiết
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                      <InputUploadImage label={"Chọn ảnh"}>
+                        <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
+                          Upload
+                          <input
+                            hidden
+                            accept="image/*"
+                            multiple
+                            type="file"
+                            onChange={(e) => handleFilesChange("file1", e.target.files[0])}
+                          />
+                        </Button>
+                        {urls.file1 && (
+                          <img
+                            alt=""
+                            src={urls.file1}
+                            onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
+                            style={{ width: " 100%" }}
+                          />
+                        )}
+                      </InputUploadImage>
+                    </Grid>
+                    {/* <Grid item xs={8}>
                     <TextField
                       fullWidth
                       type="file"
@@ -501,142 +510,144 @@ function ProductEdit() {
                       style={{ width: " 100%" }}
                     />
                   </Grid> */}
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Grid item xs={6}>
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <InputUploadImage label={"Chọn ảnh"}>
-                      <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
-                        Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={(e) => handleFilesChange("file2", e.target.files[0])}
-                        />
-                      </Button>
-                      {urls.file2 && (
-                        <img
-                          alt=""
-                          src={urls.file2}
-                          onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
-                          style={{ width: " 100%" }}
-                        />
-                      )}
-                    </InputUploadImage>
+                <Grid item xs={6}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                      <InputUploadImage label={"Chọn ảnh"}>
+                        <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
+                          Upload
+                          <input
+                            hidden
+                            accept="image/*"
+                            multiple
+                            type="file"
+                            onChange={(e) => handleFilesChange("file2", e.target.files[0])}
+                          />
+                        </Button>
+                        {urls.file2 && (
+                          <img
+                            alt=""
+                            src={urls.file2}
+                            onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
+                            style={{ width: " 100%" }}
+                          />
+                        )}
+                      </InputUploadImage>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item xs={6}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                      <InputUploadImage label={"Chọn ảnh"}>
+                        <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
+                          Upload
+                          <input
+                            hidden
+                            accept="image/*"
+                            multiple
+                            type="file"
+                            onChange={(e) => handleFilesChange("file3", e.target.files[0])}
+                          />
+                        </Button>
+                        {urls.file3 && (
+                          <img
+                            alt=""
+                            src={urls.file3}
+                            onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
+                            style={{ width: " 100%" }}
+                          />
+                        )}
+                      </InputUploadImage>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item xs={6}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                      <InputUploadImage label={"Chọn ảnh"}>
+                        <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
+                          Upload
+                          <input
+                            hidden
+                            accept="image/*"
+                            multiple
+                            type="file"
+                            onChange={(e) => handleFilesChange("file4", e.target.files[0])}
+                          />
+                        </Button>
+                        {urls.file4 && (
+                          <img
+                            alt=""
+                            src={urls.file4}
+                            onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
+                            style={{ width: " 100%" }}
+                          />
+                        )}
+                      </InputUploadImage>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item xs={6}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                      <InputUploadImage label={"Chọn ảnh"}>
+                        <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
+                          Upload
+                          <input
+                            hidden
+                            accept="image/*"
+                            multiple
+                            type="file"
+                            onChange={(e) => handleFilesChange("file5", e.target.files[0])}
+                          />
+                        </Button>
+                        {urls.file5 && (
+                          <img
+                            alt=""
+                            src={urls.file5}
+                            onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
+                            style={{ width: " 100%" }}
+                          />
+                        )}
+                      </InputUploadImage>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item xs={6}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                      <InputUploadImage label={"Chọn ảnh"}>
+                        <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
+                          Upload
+                          <input
+                            hidden
+                            accept="image/*"
+                            multiple
+                            type="file"
+                            onChange={(e) => handleFilesChange("file6", e.target.files[0])}
+                          />
+                        </Button>
+                        {urls.file6 && (
+                          <img
+                            alt=""
+                            src={urls.file6}
+                            onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
+                            style={{ width: " 100%" }}
+                          />
+                        )}
+                      </InputUploadImage>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={6}>
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <InputUploadImage label={"Chọn ảnh"}>
-                      <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
-                        Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={(e) => handleFilesChange("file3", e.target.files[0])}
-                        />
-                      </Button>
-                      {urls.file3 && (
-                        <img
-                          alt=""
-                          src={urls.file3}
-                          onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
-                          style={{ width: " 100%" }}
-                        />
-                      )}
-                    </InputUploadImage>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={6}>
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <InputUploadImage label={"Chọn ảnh"}>
-                      <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
-                        Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={(e) => handleFilesChange("file4", e.target.files[0])}
-                        />
-                      </Button>
-                      {urls.file4 && (
-                        <img
-                          alt=""
-                          src={urls.file4}
-                          onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
-                          style={{ width: " 100%" }}
-                        />
-                      )}
-                    </InputUploadImage>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={6}>
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <InputUploadImage label={"Chọn ảnh"}>
-                      <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
-                        Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={(e) => handleFilesChange("file5", e.target.files[0])}
-                        />
-                      </Button>
-                      {urls.file5 && (
-                        <img
-                          alt=""
-                          src={urls.file5}
-                          onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
-                          style={{ width: " 100%" }}
-                        />
-                      )}
-                    </InputUploadImage>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={6}>
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <InputUploadImage label={"Chọn ảnh"}>
-                      <Button variant="contained" component="label" style={{ marginBottom: "5px" }}>
-                        Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={(e) => handleFilesChange("file6", e.target.files[0])}
-                        />
-                      </Button>
-                      {urls.file6 && (
-                        <img
-                          alt=""
-                          src={urls.file6}
-                          onClick={(e) => handleImageClick({ open: true, image: e.target.currentSrc })}
-                          style={{ width: " 100%" }}
-                        />
-                      )}
-                    </InputUploadImage>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Box>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
+      {tab === 2 && <CommentPage idProduct={pathNameSplit[2]}></CommentPage>}
       <Dialog
         open={dialogImage.open}
         fullWidth
