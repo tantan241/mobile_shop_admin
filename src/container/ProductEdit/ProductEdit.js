@@ -214,7 +214,7 @@ function ProductEdit() {
                 color="error"
                 onClick={() => {
                   dispatch(actions.setReload(new Date() * 1));
-                  // navigate("/brand");
+                  navigate("/product");
                 }}
               >
                 Hủy bỏ

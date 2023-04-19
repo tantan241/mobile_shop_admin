@@ -1,5 +1,5 @@
 import { Box, Button, Dialog, DialogTitle, Fab, Grid, IconButton, MenuItem, TextField } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { API_ADMIN_COMMENT, API_GET_ONE_COMMENT, API_UPDATE_COMMENT, URL_IMAGE } from "~/api";
 import List from "~/components/List/List";
 import EditIcon from "@mui/icons-material/Edit";
@@ -13,6 +13,14 @@ function CommentPage(props) {
   const [urlImage, setUrlImage] = useState("");
   const [comment, setComment] = useState({});
   const [reload, setReload] = useState(0);
+  const [data, setData] = useState({});
+  useEffect(() => {
+    fetchData(`${API_ADMIN_COMMENT}/${idProduct}/get-info-comment`, {}, "GET", true).then((res) => {
+      if (res.status === 200) {
+        setData(res.data);
+      }
+    });
+  }, [idProduct]);
   const mapFunction = useCallback((data) => {
     return data.map((item) => ({
       ...item,
@@ -40,62 +48,58 @@ function CommentPage(props) {
     },
     [comment]
   );
+
   return (
-    <Box>
+    <Box marginTop={"20px"}>
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <Grid container spacing={4} alignItems={"center"}>
             <Grid item xs={4}>
-              <img
-                width={"200px"}
-                height={"200px"}
-                src="data:image/jpeg;base64,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"
-                alt=""
-              />
-              <p>Sam sung galaxy A32 Sam sung galaxy A32 Sam sung galaxy A32 Sam sung galaxy A32 Sam sung galaxy A32</p>
+              <img width={"200px"} height={"200px"} src={data.image ? `${URL_IMAGE}/${data.image}` : ""} alt="" />
+              <p>{data?.name}</p>
             </Grid>
             <Grid item xs={8}>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <div style={{ display: "flex" }}>
                     <div>Tổng số đánh giá: &nbsp;</div>
-                    <div> 500 đánh giá</div>
+                    <div>{data?.totalComment} đánh giá</div>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
                   <div style={{ display: "flex" }}>
                     <div>Trung bình sao đánh giá: &nbsp;</div>
-                    <div>4.5</div>
+                    <div>{data?.avg}</div>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
                   <div style={{ display: "flex" }}>
                     <div>Số đánh giá 5 sao: &nbsp;</div>
-                    <div> 500 đánh giá</div>
+                    <div> {data?.star_5} đánh giá</div>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
                   <div style={{ display: "flex" }}>
                     <div>Số đánh giá 4 sao:&nbsp;</div>
-                    <div> 500 đánh giá</div>
+                    <div> {data?.star_4} đánh giá</div>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
                   <div style={{ display: "flex" }}>
                     <div>Số đánh giá 3 sao:&nbsp;</div>
-                    <div> 500 đánh giá</div>
+                    <div> {data?.star_3} đánh giá</div>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
                   <div style={{ display: "flex" }}>
                     <div>Số đánh giá 2 sao:&nbsp;</div>
-                    <div> 500 đánh giá</div>
+                    <div> {data?.star_2} đánh giá</div>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
                   <div style={{ display: "flex" }}>
                     <div>Số đánh giá 1 sao:&nbsp;</div>
-                    <div> 500 đánh giá</div>
+                    <div> {data?.star_1} đánh giá</div>
                   </div>
                 </Grid>
               </Grid>

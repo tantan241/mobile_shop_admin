@@ -21,9 +21,11 @@ import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
 import ListItemButton from "@mui/material/ListItemButton";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import BrandingWatermarkIcon from "@mui/icons-material/BrandingWatermark";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import HeadphonesBatteryIcon from "@mui/icons-material/HeadphonesBattery";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import PeopleIcon from "@mui/icons-material/People";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { routes } from "~/routes";
 import useStore from "~/store/hooks";
@@ -95,6 +97,20 @@ function MainLayout() {
       title: "ĐƠN HÀNG",
       to: "/order",
       icon: <LibraryBooksIcon />,
+      children: [],
+    },
+    {
+      id: 4,
+      title: "KHÁCH HÀNG",
+      to: "/customer",
+      icon: <PeopleIcon />,
+      children: [],
+    },
+    {
+      id: 5,
+      title: "TÀI KHOẢN",
+      to: "/account",
+      icon: <AccountCircleIcon />,
       children: [],
     },
   ];
