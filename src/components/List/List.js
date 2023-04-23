@@ -301,7 +301,7 @@ function List(props) {
                   }}
                 >
                   <CloseIcon></CloseIcon>
-                  Xóa lọc
+                  Xóa sắp xếp
                 </Button>
               )}
             </>
@@ -496,7 +496,7 @@ function List(props) {
                 fullWidth
                 size="small"
                 select
-                label="Trường lọc"
+                label="Trường sắp xếp"
                 value={filter.field}
                 onChange={(e) => handleFieldFilterChange("field", e.target.value)}
               >
@@ -512,7 +512,7 @@ function List(props) {
                 size="small"
                 fullWidth
                 select
-                label="Lọc theo"
+                label="Sắp xếp theo"
                 value={filter.sort}
                 onChange={(e) => {
                   handleFieldFilterChange("sort", e.target.value);
@@ -531,7 +531,7 @@ function List(props) {
                   onClick={handleFilter}
                   style={{ marginRight: "5px" }}
                 >
-                  Lọc
+                  Sắp xếp
                 </Button>
                 <Button
                   variant="outlined"

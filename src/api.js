@@ -13,6 +13,9 @@ export const API_ADMIN_ORDER = `${URL}/order/admin`;
 
 export const API_ADMIN_COMMENT = `${URL}/comment/admin`;
 
+export const API_ADMIN_CUSTOMER = `${URL}/user/admin`;
+
+
 
 // export const API_ADMIN_GET_BRAND = `${API_ADMIN_PRODUCT}/get-brand`;
 

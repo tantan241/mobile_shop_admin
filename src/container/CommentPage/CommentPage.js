@@ -134,7 +134,7 @@ function CommentPage(props) {
               field: "image",
               data: (params) => (
                 <img
-                  width={"80%"}
+                  width={"60%"}
                   alt=""
                   src={`${URL_IMAGE}/${params.value}`}
                   onClick={() => {

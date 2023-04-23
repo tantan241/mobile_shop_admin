@@ -201,10 +201,13 @@ function ProductEdit() {
   }
   return (
     <Paper style={{ padding: "20px" }}>
-      <Tabs value={tab} onChange={(e, value) => setTab(value)}>
-        <Tab value={1} label="THÔNG TIN"></Tab>
-        <Tab value={2} label="BÌNH LUẬN"></Tab>
-      </Tabs>
+      {pathNameSplit[2] && pathNameSplit[2] !== "add" && (
+        <Tabs value={tab} onChange={(e, value) => setTab(value)}>
+          <Tab value={1} label="THÔNG TIN"></Tab>
+          <Tab value={2} label="BÌNH LUẬN"></Tab>
+        </Tabs>
+      )}
+
       {tab === 1 && (
         <Grid container spacing={4} style={{ marginTop: "20px" }}>
           <Grid item xs={12}>
