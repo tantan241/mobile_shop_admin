@@ -22,9 +22,14 @@ export const API_ADMIN_CUSTOMER = `${URL}/user/admin`;
 export const API_GET_ONE_BRAND = `${API_ADMIN_PRODUCT}/get-one-brand`;
 export const API_GET_ONE_PRODUCT = `${API_ADMIN_PRODUCT}/get-one-product`;
 export const API_ADD_BRAND = `${API_ADMIN_PRODUCT}/add-brand`;
+export const API_DASHBOARD = `${API_ADMIN_PRODUCT}/dashboard`;
 export const API_GET_ALL_BRAND_FOR_PRODUCT = `${API_ADMIN_PRODUCT}/get-all-brand-product`;
 export const API_ADD_PRODUCT = `${API_ADMIN_PRODUCT}/add-product`;
 
 export const API_GET_ONE_COMMENT = `${API_ADMIN_COMMENT}/get-one-comment`;
 export const API_UPDATE_COMMENT = `${API_ADMIN_COMMENT}/update-comment`;
 
+export const API_GET_ONE_CUSTOMER = `${API_ADMIN_CUSTOMER}/get-one-customer`;
+export const API_ADD_CUSTOMER = `${API_ADMIN_CUSTOMER}/add-customer`;
+
+export const API_GET_ONE_ORDER = `${API_ADMIN_ORDER}/get-one-order`;

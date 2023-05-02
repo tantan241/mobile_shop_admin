@@ -9,7 +9,12 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  Menu,
+  MenuItem,
   Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import classNames from "classnames/bind";
 import styles from "./MainLayout.module.scss";
@@ -17,7 +22,7 @@ import { useEffect, useState } from "react";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import HomeIcon from "@mui/icons-material/Home";
-import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Link, Route, Routes, useNavigate } from "react-router-dom";
 import ListItemButton from "@mui/material/ListItemButton";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import BrandingWatermarkIcon from "@mui/icons-material/BrandingWatermark";
@@ -29,9 +34,39 @@ import PeopleIcon from "@mui/icons-material/People";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { routes } from "~/routes";
 import useStore from "~/store/hooks";
+
 const cx = classNames.bind(styles);
-function MainLayout() {
+
+function DialogCustom({ open, handleClose, setIsLogin }) {
+  const navigate = useNavigate();
+  return (
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>Bạn chắc chắn muốn đăng xuất?</DialogTitle>
+      <DialogContent style={{ display: "flex", flexDirection: "row-reverse" }}>
+        <Button onClick={handleClose} variant="outlined" color="error">
+          Hủy bỏ
+        </Button>
+        <div style={{ margin: " 0 5px" }}></div>
+        <Button variant="contained" color="primary" onClick={() => setIsLogin(false)}>
+          Đồng ý
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+function MainLayout(props) {
+  const { setIsLogin } = props;
   const [store, dispatch] = useStore();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleAvatarClick = (event) => {
+    console.log(event.currentTarget);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const [open, setOpen] = useState([]);
   const [titleAppBar, setTitleAppBar] = useState("TRANG CHỦ");
   const handleClick = (id) => {
@@ -125,7 +160,25 @@ function MainLayout() {
           >
             <ListItem className={cx("header-nav")}>
               <div className={cx("header-text")}>ADMIN</div>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              <div onClick={(e) => handleAvatarClick(e)}>
+                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              </div>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+              >
+                <MenuItem onClick={() => setOpenDialog(true)}>Đăng xuất</MenuItem>
+              </Menu>
             </ListItem>
             {routers.map((item) => (
               <>
@@ -194,6 +247,7 @@ function MainLayout() {
             </Routes>
           </div>
         </Grid>
+        <DialogCustom open={openDialog} handleClose={() => setOpenDialog(false)} setIsLogin={setIsLogin}></DialogCustom>
       </Router>
     </div>
   );

@@ -54,4 +54,9 @@ export const routes = [
     path: "/account",
     component: AccountPage,
   },
+  {
+    path: "/",
+    component: Dashboard,
+  },
+  
 ];

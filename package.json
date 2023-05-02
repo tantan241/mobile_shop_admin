@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^37.0.1",
+    "@ckeditor/ckeditor5-build-classic": "^37.1.0",
     "@ckeditor/ckeditor5-react": "^6.0.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
@@ -18,9 +18,11 @@
     "normalize.css": "^8.0.1",
     "notistack": "^3.0.1",
     "react": "^18.2.0",
+    "react-ckeditor-component": "^1.1.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0",
     "react-scripts": "5.0.1",
+    "tinymce": "^6.4.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

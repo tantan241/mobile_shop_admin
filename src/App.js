@@ -4,7 +4,7 @@ import LoginForm from "./container/LoginForm/LoginForm";
 
 function App() {
   const [login, setIsLogin] = useState(false);
-  return <> {login ? <MainLayout /> : <LoginForm setIsLogin={setIsLogin}></LoginForm>}</>;
+  return <> {login ? <MainLayout setIsLogin={setIsLogin} /> : <LoginForm setIsLogin={setIsLogin}></LoginForm>}</>;
 }
 
 export default App;
