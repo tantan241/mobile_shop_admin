@@ -41,14 +41,19 @@ function CustomerEdit() {
               variant="contained"
               color="error"
               onClick={() => {
-                dispatch(actions.setReload(new Date() * 1));
                 navigate("/customer");
               }}
             >
               Hủy bỏ
             </Button>
             <div style={{ margin: "0 5px" }}></div>
-            <Button variant="contained" onClick={() => handleSave()}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                dispatch(actions.setReload(new Date() * 1));
+                handleSave();
+              }}
+            >
               Lưu
             </Button>
           </div>

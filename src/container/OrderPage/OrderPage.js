@@ -5,7 +5,6 @@ import List from "~/components/List/List";
 import moment from 'moment';
 function OrderPage() {
     const mapFunction = useCallback((data) => {
-        console.log(data)
         return data.map((item) => ({
           ...item,
           status: item.status == 1 ? "Hoạt động" : "Ngừng hoạt động",

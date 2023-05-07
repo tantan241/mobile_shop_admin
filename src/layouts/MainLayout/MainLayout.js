@@ -60,7 +60,6 @@ function MainLayout(props) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const handleAvatarClick = (event) => {
-    console.log(event.currentTarget);
     setAnchorEl(event.currentTarget);
   };
 

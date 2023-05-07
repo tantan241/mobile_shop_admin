@@ -78,7 +78,7 @@ function Dashboard() {
           <Card style={{ color: "white", backgroundColor: "#14a6c380" }}>
             <CardContent style={{ fontSize: "18px", textAlign: "center" }}>
               Số đơn hàng đã tạo
-              <div style={{ fontSize: "60px", marginTop: "20px" }}>{localData.order_count}</div>
+              <div style={{ fontSize: "60px", marginTop: "20px" }}>{localData.order_count || 0}</div>
             </CardContent>
             <CardActions onClick={() => navigate("/order")}>
               <ArrowBackIosIcon></ArrowBackIosIcon>
@@ -90,7 +90,7 @@ function Dashboard() {
           <Card style={{ color: "white", backgroundColor: "#14a6c380" }}>
             <CardContent style={{ fontSize: "18px", textAlign: "center" }}>
               Số khách hàng mới
-              <div style={{ fontSize: "60px", marginTop: "20px" }}>{localData.user_count}</div>
+              <div style={{ fontSize: "60px", marginTop: "20px" }}>{localData.user_count || 0}</div>
             </CardContent>
             <CardActions onClick={() => navigate("/order")}>
               <ArrowBackIosIcon></ArrowBackIosIcon>
@@ -114,7 +114,7 @@ function Dashboard() {
           <Card style={{ color: "white", backgroundColor: "#14a6c380", minHeight: "182px" ,position: "relative" }}>
             <CardContent style={{ fontSize: "18px", textAlign: "center" }} >
               Sản phẩm bán chạy
-              <div style={{ fontSize: "20px", marginTop: "20px"}}>{localData.product_name}</div>
+              <div style={{ fontSize: "20px", marginTop: "20px"}}>{localData.product_name || "Không có"}</div>
             </CardContent>
             <CardActions style={{position: "absolute", bottom: 0}}  onClick={() => navigate("/product")}>
               <ArrowBackIosIcon></ArrowBackIosIcon>
@@ -126,7 +126,7 @@ function Dashboard() {
           <Card style={{ color: "white", backgroundColor: "rgb(235 224 23 / 96%)" }}>
             <CardContent style={{ fontSize: "18px", textAlign: "center" }}>
               Số sản phẩm hết hàng
-              <div style={{ fontSize: "60px", marginTop: "20px" }}>{localData.product_number_0}</div>
+              <div style={{ fontSize: "60px", marginTop: "20px" }}>{localData.product_number_0 ||0}</div>
             </CardContent>
             <CardActions onClick={() => navigate("/product")}>
               <ArrowBackIosIcon></ArrowBackIosIcon>

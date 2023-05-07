@@ -40,7 +40,20 @@ function CustomFooter(props) {
 }
 
 function List(props) {
-  const { height, url, mapFunction, rowsPerPageOptions, model, actions, cellCustom, disableAdd, customEdit, reloadOut } = props;
+  const {
+    height,
+    url,
+    mapFunction,
+    rowsPerPageOptions,
+    model,
+    actions,
+    cellCustom,
+    disableAdd,
+    customEdit,
+    reloadOut,
+    disableCheckbox,
+    customAction
+  } = props;
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
   const [rowsSelect, setRowsSelect] = useState([]);
@@ -189,31 +202,35 @@ function List(props) {
             : (params) => (
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div>{params.value}</div>
-                  <div style={{ marginLeft: "auto", display: "flex" }}>
-                    {customEdit ? (
-                      customEdit(params)
-                    ) : (
-                      <Fab size="small" color="primary">
-                        <IconButton aria-label="edit" onClick={() => navigate(`${params.row.id}`)}>
-                          <EditIcon style={{ color: "white" }} />
+                  {customAction ? (
+                    customAction(params)
+                  ) : (
+                    <div style={{ marginLeft: "auto", display: "flex" }}>
+                      {customEdit ? (
+                        customEdit(params)
+                      ) : (
+                        <Fab size="small" color="primary">
+                          <IconButton aria-label="edit" onClick={() => navigate(`${params.row.id}`)}>
+                            <EditIcon style={{ color: "white" }} />
+                          </IconButton>
+                        </Fab>
+                      )}
+
+                      <div style={{ margin: "0 4px" }}></div>
+                      <Fab size="small" color="error">
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => {
+                            setClickDeleteMultiple(false);
+                            setOneRowDelete(params.row);
+                            setOpenDialogDelete(true);
+                          }}
+                        >
+                          <DeleteIcon style={{ color: "white" }} />
                         </IconButton>
                       </Fab>
-                    )}
-
-                    <div style={{ margin: "0 4px" }}></div>
-                    <Fab size="small" color="error">
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => {
-                          setClickDeleteMultiple(false);
-                          setOneRowDelete(params.row);
-                          setOpenDialogDelete(true);
-                        }}
-                      >
-                        <DeleteIcon style={{ color: "white" }} />
-                      </IconButton>
-                    </Fab>
-                  </div>
+                    </div>
+                  )}
                 </div>
               ),
         });
@@ -232,7 +249,7 @@ function List(props) {
         setRows(rowsList);
       }
     });
-  }, [url, rowsPerPage, page, mapFunction, model, reload,reloadOut]);
+  }, [url, rowsPerPage, page, mapFunction, model, reload, reloadOut]);
   const handleSelectionModelChange = useCallback(
     (newSelectionModel) => {
       const selectedRows = rows.filter((row) => newSelectionModel.includes(row.id));
@@ -343,7 +360,7 @@ function List(props) {
         rows={rows}
         columns={columns}
         disableRowSelectionOnClick
-        checkboxSelection
+        checkboxSelection={disableCheckbox ? false : true}
         onRowSelectionModelChange={handleSelectionModelChange}
         hideFooterPagination
         disableColumnMenu
