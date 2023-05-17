@@ -118,7 +118,7 @@ function OrderEdit() {
       orderDetail.length > 0 ? localValues.orderDetail.find((item) => item.product_id === product.id) : "";
     if (haveProduct && Object.keys(haveProduct).length > 0) {
       orderDetail = orderDetail.map((item) =>
-        item.product_id === product.id ? { ...item, number: item.number + numberBuy } : item
+        item.product_id === product.id ? { ...item, number: (item.number*1 + numberBuy*1).toString() } : item
       );
     } else {
       const productBuy = { ...product, number: numberBuy, product_id: product.id };
