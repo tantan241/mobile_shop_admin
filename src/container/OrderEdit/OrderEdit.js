@@ -23,7 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
-import { API_ADMIN_PRODUCT, API_GET_ONE_ORDER } from "~/api";
+import { API_ADD_ORDER, API_ADMIN_PRODUCT, API_GET_ONE_ORDER } from "~/api";
 import { fetchData, handleClickVariant } from "~/common";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -110,7 +110,21 @@ function OrderEdit() {
     });
   };
   const handleSave = useCallback(() => {
-    console.log(localValues);
+    let totalMoney = 0;
+    localValues.orderDetail.forEach((item) => {
+      totalMoney = totalMoney + item.number * item.price;
+    });
+    const dataPost = {
+      ...localValues,
+      orderDetail: localValues.orderDetail.map((item) => ({ ...item, number: item.number * 1 })),
+      totalMoney,
+    };
+    fetchData(API_ADD_ORDER, dataPost, "POST", true).then((res) => {
+      if (res.status === 200) {
+        handleClickVariant("success", res.messenger, enqueueSnackbar);
+        navigate("/order");
+      }
+    });
   }, [localValues]);
   const handleBuyProduct = useCallback(() => {
     let orderDetail = localValues.orderDetail;
@@ -118,7 +132,7 @@ function OrderEdit() {
       orderDetail.length > 0 ? localValues.orderDetail.find((item) => item.product_id === product.id) : "";
     if (haveProduct && Object.keys(haveProduct).length > 0) {
       orderDetail = orderDetail.map((item) =>
-        item.product_id === product.id ? { ...item, number: (item.number*1 + numberBuy*1).toString() } : item
+        item.product_id === product.id ? { ...item, number: (item.number * 1 + numberBuy * 1).toString() } : item
       );
     } else {
       const productBuy = { ...product, number: numberBuy, product_id: product.id };
@@ -129,15 +143,15 @@ function OrderEdit() {
       orderDetail,
     }));
     setOpenDialog({ dialogNumber: false, dialogAddProduct: false });
-    handleClickVariant( "success", "Thêm thành công", enqueueSnackbar);
+    handleClickVariant("success", "Thêm thành công", enqueueSnackbar);
   }, [product, numberBuy]);
   const handDeleteOrderDetail = useCallback(() => {
     let orderDetail = localValues.orderDetail;
-    orderDetail=orderDetail.filter((item) => item.product_id !== idProductChoose);
-   
+    orderDetail = orderDetail.filter((item) => item.product_id !== idProductChoose);
+
     setLocalValues((prev) => ({ ...prev, orderDetail }));
-    setOpenDialog((prev) => ({ ...prev, dialogDeleteProduct: false }))
-    handleClickVariant( "success", "Xóa thành công", enqueueSnackbar);
+    setOpenDialog((prev) => ({ ...prev, dialogDeleteProduct: false }));
+    handleClickVariant("success", "Xóa thành công", enqueueSnackbar);
   }, [localValues, idProductChoose]);
   return (
     <Paper style={{ padding: "20px" }}>
@@ -344,8 +358,9 @@ function OrderEdit() {
                         id: params.row.id,
                         name: params.row.name,
                         discount: params.row.discount,
-                        price: params.row.price,
+                        price: params.row.price - (params.row.price * params.row.discount) / 100,
                         number: 0,
+                        order_id: pathNameSplit[2] * 1,
                       });
                       setOpenDialog((prev) => ({ ...prev, dialogNumber: true }));
                     }}

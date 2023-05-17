@@ -33,3 +33,4 @@ export const API_GET_ONE_CUSTOMER = `${API_ADMIN_CUSTOMER}/get-one-customer`;
 export const API_ADD_CUSTOMER = `${API_ADMIN_CUSTOMER}/add-customer`;
 
 export const API_GET_ONE_ORDER = `${API_ADMIN_ORDER}/get-one-order`;
+export const API_ADD_ORDER = `${API_ADMIN_ORDER}/add-order`;
