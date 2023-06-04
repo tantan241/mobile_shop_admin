@@ -76,37 +76,52 @@ function OrderEdit() {
   }, []);
 
   const handleCreatePdf = () => {
-    console.log(localValues);
-    const input = `<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Document</title> </head> <body> <div style="width: 90%;  height: 1122px; padding: 50px; line-height: 1.5;font-size: 13pt;"> <div style="font-weight: 700; text-align: center; font-size: 20pt"> CỬA HÀNG ĐIỆN THOẠI VÀ PHỤ KIỆN TÂN MOBILE </div> <div style="text-align: right">Ngày: ${moment().format(
+    let totalMoney = 0
+    localValues.orderDetail.forEach((item) => {
+      totalMoney+=(item.number * item.price)
+    })
+    const input = ` <div style="width: 65%;  height: 1800px; padding: 50px 50px 0; line-height: 1.8;font-size: 15pt;"> <div style="font-weight: 700; text-align: center; font-size: 28pt"> CỬA HÀNG ĐIỆN THOẠI VÀ PHỤ KIỆN TÂN MOBILE </div> <div style="text-align: right">Ngày: ${moment().format(
       "DD-MM-YYYY"
     )}</div> <div style="font-weight: 500; text-align: center; font-size: 18pt ">HÓA ĐƠN THANH TOÁN</div> <div>Khách hàng: ${
       localValues.name
     }</div> <div>Điện thoại: ${localValues.phone}</div> <div style="margin: 10px 0"></div>${localValues.orderDetail
       .map(
         (item) =>
-          `<div> <div style="border-top: 1px dashed rgb(0, 0, 0)"></div> <div>${item.name}</div> <div style="display: flex; flex-direction: row-reverse"> <div>${item.price}</div> <div style="margin: 0 20px"></div> <div>${item.number}</div> </div> </div>`
+          `<div> <div style="border-top: 1px dashed rgb(0, 0, 0)"></div> <div>${
+            item.name
+          }</div> <div style="display: flex; flex-direction: row-reverse"> <div style="width: 150px">${item.price
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} vnđ</div> <div style="margin: 0 30px"></div> <div>${
+            item.number
+          }</div> </div> </div>`
       )
       .join(
         ""
-      )}   <div style="margin: 10px 0"></div> <div style="border-top: 1px dashed rgb(0, 0, 0)"></div> <div style="display: flex; flex-direction: row-reverse"> <div>${
-      localValues.totalMoney
-    }</div> <div style="margin: 0 20px"></div> <div>Tổng tiền thanh toán</div> </div> <div style="display: flex"> <div>Số hóa đơn:</div> <div style="margin: 0 2px"></div> <div style="font-weight: 700">${
+      )}   <div style="margin: 10px 0"></div> <div style="border-top: 1px dashed rgb(0, 0, 0)"></div> <div style="display: flex; flex-direction: row-reverse"> <div>${parseInt(
+      totalMoney
+    )
+      .toString()
+      .replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        "."
+      )} vnđ</div> <div style="margin: 0 20px"></div> <div>Tổng tiền thanh toán</div> </div> <div style="display: flex"> <div>Số hóa đơn:</div> <div style="margin: 0 2px"></div> <div style="font-weight: 700">${
       localValues.id
-    }</div> </div> <div>Ngày: ${moment().format(
-      "DD-MM-YYYY"
-    )}</div> <div>NV lập hóa đơn: NV1</div> </div> </body></html>`;
+    }</div> </div> <div>Ngày: ${moment().format("DD-MM-YYYY")}</div> <div>NV lập hóa đơn: NV1</div> </div> `;
 
-    const div = document.createElement("div");
-
+    const div = document.querySelector(".order");
+    div.style.display = "flex";
+    div.style.justifyContent = "center";
     div.innerHTML = input;
-    document.body.appendChild(div);
+    // document.body.appendChild(div);
     html2canvas(div).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF();
       pdf.addImage(imgData, "PNG", 0, 0, 210, 297);
       const pdfBlob = pdf.output("blob");
       setPdfUrl(URL.createObjectURL(pdfBlob));
-      document.body.removeChild(div);
+      div.style.display = "none";
+
+      // document.body.removeChild(div);
     });
   };
   const handleSave = useCallback(() => {
@@ -144,6 +159,7 @@ function OrderEdit() {
     }));
     setOpenDialog({ dialogNumber: false, dialogAddProduct: false });
     handleClickVariant("success", "Thêm thành công", enqueueSnackbar);
+    setPdfUrl("")
   }, [product, numberBuy]);
   const handDeleteOrderDetail = useCallback(() => {
     let orderDetail = localValues.orderDetail;
@@ -322,8 +338,16 @@ function OrderEdit() {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   {pdfUrl && (
-                    <iframe src={pdfUrl} width={"100%"} height={"1000px"} allowfullscreen title="Hóa đơn"></iframe>
+                    <iframe
+                      src={pdfUrl}
+                      width={"100%"}
+                      height={"800px"}
+                      style={{overflow: "hidden"}}
+                      allowfullscreen
+                      title="Hóa đơn"
+                    ></iframe>
                   )}
+                  <div className="order"></div>
                 </Grid>
               </Grid>
             </Box>
